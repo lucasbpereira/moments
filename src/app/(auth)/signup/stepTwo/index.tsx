@@ -13,6 +13,7 @@ import { Picker } from '@react-native-picker/picker';
 import DatePicker from '@/components/datePicker';
 import { useAccountForm } from '@/src/hooks/useAccountForm';
 import { AccountProps } from '@/src/context/AccountFormContext';
+import Toggle from '@/components/toggle';
 
 const StepTwo = () => {
   const { updateFormData } = useAccountForm();
@@ -100,6 +101,12 @@ const StepTwo = () => {
                     onSubmitEditing: () =>  handleSubmit(handleNextStep)(),
                     returnKeyType: "next"
                   }}
+                />
+                <Toggle
+                  formProps={{ 
+                    control,
+                    name: 'sharedPhone' }}
+                  label="Desejo compartilhar meu número com todos os usuários"
                 />
                    
               <View style={[globalStyles.row, styles.formFooter]}>

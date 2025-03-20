@@ -29,6 +29,10 @@ const StepThree = () => {
     updateFormData(data)
   };
 
+  function getFullAddress(data: AccountProps) {
+    console.log(data.cep)
+  };
+
     return (
         <View style={styles.container}>
           <Image style={styles.logo} source={require("@/assets/logo.png")} />             
@@ -46,7 +50,7 @@ const StepThree = () => {
                   }} 
                   inputProps={{
                     placeholder: 'CEP',
-                    onSubmitEditing: () => houseNumberRef.current?.focus()
+                    onSubmitEditing: () =>  handleSubmit(getFullAddress)(),
                   }}
                 />
                 <Input
