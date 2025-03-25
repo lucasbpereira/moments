@@ -1,5 +1,5 @@
-import { Text, View, Image, TouchableOpacity, TextInput, Pressable } from 'react-native';
-import {styles} from './styles';
+import { Text, View, Image, TouchableOpacity, TextInput, Pressable, SafeAreaView, ScrollView } from 'react-native';
+import styles from './styles';
 import {globalStyles} from '@/src/styles';
 import React, { useRef } from 'react';
 import { router, useRouter } from 'expo-router';
@@ -22,7 +22,7 @@ const SignUp = () => {
 
   function handleNextStep(data: AccountProps) {
     updateFormData(data)
-    router.push('/(auth)/signup/stepTwo');
+    router.push('/signup/stepTwo');
   };
 
   function validationPasswordConfirmation(passwordConfirmation: string) {
@@ -32,118 +32,121 @@ const SignUp = () => {
   };
 
   return (
-      <View style={styles.container}>
-        <Image style={styles.logo} source={require("@/assets/logo.png")} />             
-          <View style={styles.content}>  
-            <Text style={styles.titleText}>Cadastro</Text>
-              <Input
-                ref={firstNameRef}
-                error={errors.firstName?.message}
-                formProps={{
-                  name: "firstName", 
-                  control,
-                  rules: {
-                    required: "Nome é obrigatório"
-                  }
-                }} 
-                inputProps={{
-                  placeholder: 'Nome',
-                  onSubmitEditing: () => lastNameRef.current?.focus()
-                }}
-              />
-              <Input
-                ref={lastNameRef}
-                error={errors.lastName?.message}
-                formProps={{
-                  name: "lastName", 
-                  
-                  control,
-                  rules: {
-                    required: "Sobrenome é obrigatório"
-                  }
-                }} 
-                inputProps={{
-                  placeholder: 'Sobrenome',
-                  onSubmitEditing: () => emailRef.current?.focus()
-                }}
-              />
-              <Input
-                ref={emailRef}
-                error={errors.email?.message}
-                formProps={{
-                  name: "email", 
-                  control,
-                  rules: {
-                    required: "E-mail é obrigatório",
-                    pattern: {
-                      value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(?:\.[a-zA-Z]{2,})?$/,
-                      message: "E-mail inválido"
+    <SafeAreaView style={{flex: 1}}>
+      <ScrollView style={{flex: 1}}>
+        <View style={styles.container}>
+          <Image style={styles.logo} source={require("@/assets/logo.png")} />             
+            <View style={styles.content}>  
+              <Text style={styles.titleText}>Cadastro</Text>
+                <Input
+                  ref={firstNameRef}
+                  error={errors.firstName?.message}
+                  formProps={{
+                    name: "firstName", 
+                    control,
+                    rules: {
+                      required: "Nome é obrigatório"
                     }
-                  }
-                }} 
-                inputProps={{
-                  placeholder: 'E-mail',
-                  onSubmitEditing: () => passwordRef.current?.focus()
-                }}
-              />
-              <Input
-                ref={passwordRef}
-                error={errors.password?.message}
-                passwordInput={true}
-                formProps={{
-                  name: "password", 
-                  control,
-                  rules: {
-                    required: "Senha é obrigatório",
-                    minLength: {
-                      value: 8,
-                      message: "A senha deve ter pelo menos 8 dígitos."
+                  }} 
+                  inputProps={{
+                    placeholder: 'Nome',
+                    onSubmitEditing: () => lastNameRef.current?.focus()
+                  }}
+                />
+                <Input
+                  ref={lastNameRef}
+                  error={errors.lastName?.message}
+                  formProps={{
+                    name: "lastName", 
+                    control,
+                    rules: {
+                      required: "Sobrenome é obrigatório"
                     }
-                  }
-                }} 
-                inputProps={{
-                  placeholder: 'Senha',
-                  onSubmitEditing: () => passwordRef.current?.focus()
-                }}
-              />
-              <Input
-                ref={passwordConfirmationRef}
-                error={errors.passwordConfirmation?.message}
-                passwordInput={true}
-                formProps={{
-                  name: "passwordConfirmation", 
-                  control,
-                  rules: {
-                    required: "Confirmação de Senha é obrigatório",
-                    validate: validationPasswordConfirmation
-                  }
-                }} 
-                inputProps={{
-                  placeholder: 'Confirme sua Senha',
-                  onSubmitEditing: () => handleSubmit(handleNextStep)(),
-                  returnKeyType: "next"
-                }}
-              />
-              <View style={[globalStyles.row, styles.formFooter]}>
-                <Pressable onPress={() => router.back()} 
-                // style={globalStyles.row}
-                >
-                  {/* <ArrowLeftCircle color="black" height={32} width={32}  /> */}
-                  <Text>Já possuo conta</Text>
-                </Pressable>
-                <TouchableOpacity onPress={() => {
-                  console.log("Botão pressionado");
-                  handleSubmit(handleNextStep)();
-                }} style={globalStyles.row}>
-                  <Text>Próximo</Text>
-                  <ArrowRightCircle color="black" height={32} width={32}  />
-                </TouchableOpacity>
-              </View>
+                  }} 
+                  inputProps={{
+                    placeholder: 'Sobrenome',
+                    onSubmitEditing: () => emailRef.current?.focus()
+                  }}
+                />
+                <Input
+                  ref={emailRef}
+                  error={errors.email?.message}
+                  formProps={{
+                    name: "email", 
+                    control,
+                    rules: {
+                      required: "E-mail é obrigatório",
+                      pattern: {
+                        value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(?:\.[a-zA-Z]{2,})?$/,
+                        message: "E-mail inválido"
+                      }
+                    }
+                  }} 
+                  inputProps={{
+                    placeholder: 'E-mail',
+                    onSubmitEditing: () => passwordRef.current?.focus()
+                  }}
+                />
+                <Input
+                  ref={passwordRef}
+                  error={errors.password?.message}
+                  passwordInput={true}
+                  formProps={{
+                    name: "password", 
+                    control,
+                    rules: {
+                      required: "Senha é obrigatório",
+                      minLength: {
+                        value: 8,
+                        message: "A senha deve ter pelo menos 8 dígitos."
+                      }
+                    }
+                  }} 
+                  inputProps={{
+                    placeholder: 'Senha',
+                    onSubmitEditing: () => passwordRef.current?.focus()
+                  }}
+                />
+                <Input
+                  ref={passwordConfirmationRef}
+                  error={errors.passwordConfirmation?.message}
+                  passwordInput={true}
+                  formProps={{
+                    name: "passwordConfirmation", 
+                    control,
+                    rules: {
+                      required: "Confirmação de Senha é obrigatório",
+                      validate: validationPasswordConfirmation
+                    }
+                  }} 
+                  inputProps={{
+                    placeholder: 'Confirme sua Senha',
+                    onSubmitEditing: () => handleSubmit(handleNextStep)(),
+                    returnKeyType: "next"
+                  }}
+                />
+                <View style={[globalStyles.row, styles.formFooter]}>
+                  <Pressable onPress={() => router.back()} 
+                  // style={globalStyles.row}
+                  >
+                    {/* <ArrowLeftCircle color="black" height={32} width={32}  /> */}
+                    <Text>Já possuo conta</Text>
+                  </Pressable>
+                  <TouchableOpacity onPress={() => {
+                    console.log("Botão pressionado");
+                    handleSubmit(handleNextStep)();
+                  }} style={globalStyles.row}>
+                    <Text>Próximo</Text>
+                    <ArrowRightCircle color="black" height={32} width={32}  />
+                  </TouchableOpacity>
+                </View>
 
-          </View>
-          
+            </View>
+            
 
-      </View>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   )
 }
 

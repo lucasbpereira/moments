@@ -5,22 +5,21 @@ import { Controller, UseControllerProps } from 'react-hook-form';
 type Props = {
     formProps: UseControllerProps;
     label?: string;
-    error?: string;
 };
 
-const Toggle = forwardRef<Switch, Props>(({ formProps, label = '', error = '' }, ref) => {
+const Toggle = forwardRef<Switch, Props>(({ formProps, label = ''}, ref) => {
     return (
         <Controller
             render={({ field }) => (
                 <View style={styles.group}>
-                    {label && <Text style={styles.label}>{label}</Text>}
+                    
                     <Switch
                         ref={ref}
                         value={field.value}
                         onValueChange={field.onChange}
                         style={styles.control}
                     />
-                    {error && error.length > 0 && <Text style={styles.textError}>{error}</Text>}
+                    {label && <Text style={styles.label}>{label}</Text>}
                 </View>
             )}
             {...formProps}

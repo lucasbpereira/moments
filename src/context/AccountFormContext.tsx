@@ -1,22 +1,23 @@
 import { createContext, ReactNode, useState } from "react";
 
 export type AccountProps = {
-    firstName?: string;
-    lastName?: string;
     email?: string;
     password?: string;
     passwordConfirmation?: string;
-    birth?: string;
-    gender?: string;
-    phoneNumber?: string;
-    cep?: string;
-    houseNumber?: string;
+    birthDate?: string;
+    phone?: string;
+    phoneShare?: boolean;
+    firstName?: string;
+    lastName?: string;
     address?: string;
-    district?: string;
+    houseNumber?: string;
+    city?: string;
     state?: string;
     country?: string;
+    zip?: string;
+    gender?: string;
     invitationCode?: string;
-    phoneShare?: boolean;
+    district?: string;
 }
 
 type AccountFormContextDataProps = {

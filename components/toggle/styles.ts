@@ -3,7 +3,7 @@ import themes from '@/constants/Colors';
 
 export const styles = StyleSheet.create({
     group: {
-        flexDirection: 'column',
+        flexDirection: 'row',
         marginBottom: 10,
         width: 300
     },

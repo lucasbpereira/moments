@@ -1,7 +1,7 @@
 import { StyleSheet } from "react-native";
 import themes from '@/constants/Colors';
 
-export const styles = StyleSheet.create({
+const styles = StyleSheet.create({
     container: { 
       flex: 1, 
       justifyContent: 'center',
@@ -22,4 +22,6 @@ export const styles = StyleSheet.create({
       fontWeight: 700,
       marginBottom: 25
     }
-})
+});
+
+export default styles;
