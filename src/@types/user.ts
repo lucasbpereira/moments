@@ -1,3 +1,8 @@
+interface Roles {
+    name: string;
+    roleId: number;
+}
+
 interface UserData {
     firstName: string;
     lastName: string;
@@ -12,6 +17,8 @@ interface UserData {
     cep: string;
     gender: string;
     birthDate: string;
-    roles: string;
+    roles: Roles[];
     events: Set<Event>;
 }
+
+export { Roles, UserData };

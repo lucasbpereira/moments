@@ -26,9 +26,9 @@ export const globalStyles = StyleSheet.create({
         marginBottom: 10,
     },
     button: {
+        backgroundColor: themes.light.tint,
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: themes.light.tint,
         justifyContent: 'center',
         height: 50
     },

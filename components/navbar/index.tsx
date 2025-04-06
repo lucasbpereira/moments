@@ -1,4 +1,4 @@
-import { View, TouchableOpacity, Alert } from 'react-native';
+import { View, TouchableOpacity, Alert, Text } from 'react-native';
 import {styles} from './styles';
 import { Feather } from '@expo/vector-icons';
 import {colors} from '@/constants/Colors'
@@ -22,19 +22,27 @@ export function Navbar() {
     return (
         <View style={styles.navbar}>
             <TouchableOpacity>
-                <Feather name="home" size={24} color={colors.gray[950]} onPress={() => router.push('/dashboard')}></Feather> />
+                <Text>
+                    <Feather name="home" size={24} color={colors.gray[950]} onPress={() => router.push('/dashboard')} />
+                </Text>
             </TouchableOpacity>
             <TouchableOpacity>
-                <Feather name="search" size={24} color={colors.gray[950]} />
+                <Text>
+                    <Feather name="search" size={24} color={colors.gray[950]} />
+                </Text>
             </TouchableOpacity>
-            <TouchableOpacity>
+            {/* <TouchableOpacity>
                 <Feather name="camera" size={24} color={colors.gray[950]} />
-            </TouchableOpacity>
+            </TouchableOpacity> */}
             <TouchableOpacity onPress={() => router.push('/events')}>
-                <Feather name="calendar" size={24} color={colors.gray[950]} />
+                <Text>
+                    <Feather name="calendar" size={24} color={colors.gray[950]} />
+                </Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => handleLogout()}>
-                <Feather name="user" size={24} color={colors.gray[950]} />
+                <Text>
+                    <Feather name="user" size={24} color={colors.gray[950]} />
+                </Text>
             </TouchableOpacity>
         </View>
     )

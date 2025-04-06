@@ -10,7 +10,8 @@ const styles = StyleSheet.create({
     },
     content: {
       margin: 10,
-      width: 300
+      width: 300,
+      flex: 1, 
     },
     logo: {
       width: 100,

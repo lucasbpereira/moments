@@ -5,8 +5,11 @@ import { Navbar } from '@/components/navbar';
 import {PhotoComponent, Timeline} from '@/components/timeline';
 import { useState, useEffect } from 'react';
 import api from '@/src/services/api';
+import { useRouter } from 'expo-router';
+import { UserData } from '@/src/@types/user';
 
 export default function Dashboard() {
+    const router = useRouter();
 
     const [saudacao, setSaudacao] = useState('');
     const [data, setData] = useState<UserData | null>(null); // Tipando o estado
@@ -23,7 +26,10 @@ export default function Dashboard() {
             .catch((error) => {
                 if (error.response) {
                     // O servidor respondeu com um código de status fora do intervalo 2xx
-                    console.error('Erro de resposta:', error.response.data);
+                    console.error('Erro de resposta:', JSON.stringify(error.status));
+                    if(error.status === 401) {
+                        router.push('/(auth)/signin');
+                    }
                     Alert.alert(
                         'Erro',
                         error.response.data.message || 'Erro ao processar a requisição.',
@@ -53,11 +59,11 @@ export default function Dashboard() {
         const obterSaudacao = () => {
             const hora = new Date().getHours();
             if (hora >= 5 && hora < 12) {
-                return "Bom dia! ☀️";
+                return "Bom dia, ";
             } else if (hora >= 12 && hora < 18) {
-                return "Boa tarde! 🌤️";
+                return "Boa tarde, ";
             } else {
-                return "Boa noite! 🌙";
+                return "Boa noite, ";
             }
         };
 
@@ -77,11 +83,15 @@ export default function Dashboard() {
             <Header admin={false} />
             <View style={styles.content}>
 
-                <Text style={{ fontSize: 18, fontWeight: 'bold' }}>{saudacao}</Text>
-                <Text>Bem-vindo ao Dashboard</Text>                
                 {data && (
-                    <Text>Olá {data.firstName} {data.lastName}</Text>
+                    <View>
+                        <Text style={{ fontSize: 18, fontWeight: 'bold' }}>{saudacao}{data.firstName} {data.lastName}</Text>
+                        {data.roles[0].name === 'ADMIN' && (
+                            <Text>Você possui {data.events.size ? data.events.size : 0} eventos criados.</Text>                
+                        )}
+                    </View>
                 )}
+                
             </View>
             <Navbar />
         </View>

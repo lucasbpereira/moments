@@ -1,4 +1,4 @@
-import { View, TextInput, TextInputProps, Text, TouchableOpacity } from 'react-native';
+import { View, TextInput, TextInputProps, Text, TouchableOpacity, Pressable } from 'react-native';
 import {styles} from './styles';
 import React, { forwardRef, useState } from 'react';
 import { Controller, UseControllerProps } from 'react-hook-form';
@@ -30,9 +30,9 @@ const Input = forwardRef<TextInput, Props>(({ formProps, inputProps, error = '',
                         {...inputProps} />
                         {
                             passwordInput &&
-                            <TouchableOpacity onPress={() => setSecureText(!secureText)}>
+                            <Pressable onPress={() => setSecureText(!secureText)}>
                                 <View>{secureText ? <EyeSolid color={themes.light.tabIconDefault} height={32} width={32}/> : <EyeClosed color={themes.light.tabIconDefault} height={32} width={32}/>}</View>
-                            </TouchableOpacity>
+                            </Pressable>
                         }
                     </View>
 

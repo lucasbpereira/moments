@@ -4,13 +4,15 @@ import themes from '@/constants/Colors';
 const styles = StyleSheet.create({
     container: { 
       flex: 1, 
+      width: '100%',
+
       justifyContent: 'center',
       alignItems: 'center',
       backgroundColor: themes.light.background
     },
     content: {
       flex: 1, 
-      margin: 10,
+
       width: 300
     },
     logo: {
@@ -22,6 +24,9 @@ const styles = StyleSheet.create({
       fontSize: 28,
       fontWeight: 700,
       marginBottom: 25
+    },
+    formFooter: {
+      justifyContent: 'space-between'
     }
 })
 

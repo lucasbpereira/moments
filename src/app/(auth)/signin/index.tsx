@@ -16,7 +16,10 @@ const SignIn = () => {
   const [loading, setLoading] = useState(false);
 
   const handleLogin = async () => {
+    // Armazena o token no AsyncStorage
+    await AsyncStorage.setItem('accessToken', "");
     setLoading(true);
+    console.log(email, password)
     try {
       const data = {
         email: email.toLowerCase(),
@@ -83,7 +86,7 @@ const SignIn = () => {
           <Text style={globalStyles.textButton}>{loading ? 'Entrando...' : 'Entrar'}</Text>
         </Pressable>
         <Link href="/signup">
-          Ainda não possuo conta
+          <Text>Ainda não possuo conta</Text>
         </Link>
       </View>
     </View>
