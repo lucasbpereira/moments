@@ -31,9 +31,9 @@ export function Navbar() {
                     <Feather name="search" size={24} color={colors.gray[950]} />
                 </Text>
             </TouchableOpacity>
-            {/* <TouchableOpacity>
+            <TouchableOpacity onPress={() => router.push('/camera')}>
                 <Feather name="camera" size={24} color={colors.gray[950]} />
-            </TouchableOpacity> */}
+            </TouchableOpacity>
             <TouchableOpacity onPress={() => router.push('/events')}>
                 <Text>
                     <Feather name="calendar" size={24} color={colors.gray[950]} />

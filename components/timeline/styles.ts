@@ -85,4 +85,28 @@ export const styles = StyleSheet.create({
         marginBottom: 15,
         textAlign: 'center',
       },
+      imageContainer: {
+        position: 'relative',
+        width: '100%',
+    },
+    loadingIndicator: {
+        position: 'absolute',
+        left: 0,
+        right: 0,
+        top: 0,
+        bottom: 0,
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: 10,
+    },
+    errorContainer: {
+        position: 'absolute',
+        left: 0,
+        right: 0,
+        top: 0,
+        bottom: 0,
+        backgroundColor: '#f0f0f0',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
 })

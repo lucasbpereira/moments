@@ -23,7 +23,7 @@ const EventCard: React.FC<EventCardProps> = ({ event }) => {
   const router = useRouter();
   
   // Formata a data para exibição (ex: 31/03/2025)
-  const formattedDate = new Date(event.eventDate).toLocaleDateString('pt-BR');
+  const formattedDate = new Date(event.eventDate + 'T00:00:00').toLocaleDateString('pt-BR');
   
   // Formata a hora para exibição (ex: 15:00)
   const formattedTime = event.eventTime.substring(0, 5);
@@ -53,7 +53,7 @@ const EventCard: React.FC<EventCardProps> = ({ event }) => {
       
       <View style={styles.footer}>
         <Text style={styles.location}>{event.location}</Text>
-        <Text style={styles.participants}>{participantsInfo}</Text>
+        {/* <Text style={styles.participants}>{participantsInfo}</Text> */}
       </View>
     </Pressable>
   );

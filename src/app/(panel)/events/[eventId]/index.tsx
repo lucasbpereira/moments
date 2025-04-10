@@ -1,6 +1,6 @@
-import { View, Text, StyleSheet, Pressable, ScrollView, Alert, Image, FlatList, TouchableOpacity, Modal, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, Pressable, ScrollView, Alert, Image, FlatList } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import api from '@/src/services/api';
 import { globalStyles } from '@/src/styles';
 import { Header } from '@/components/header';
@@ -9,14 +9,18 @@ import { UserData } from '@/src/@types/user';
 import { EventData } from '@/src/@types/event';
 import ParticipantItem from '@/components/participantItem';
 import { parseQueryParams } from 'expo-router/build/fork/getStateFromPath-forks';
-import { Camera, CameraDevice, useCameraDevice, useCameraDevices, useCameraPermission, useMicrophonePermission } from "react-native-vision-camera";
-import * as MediaLibrary from "expo-media-library";
-import { Flash, FlashOff, ArrowEmailForward, RotateCameraLeft, RotateCameraRight } from 'iconoir-react-native';
-import { Video, ResizeMode } from "expo-av";
-import { styles } from './styles'
-import { StatusBar } from 'expo-status-bar';
+import { Timeline } from '@/components/timeline';
 
-const { width: widthScreen, height: heightScreen } = Dimensions.get("screen");
+export type PhotoComponent = {
+    id: string
+    fileUrl: string
+    mediaType: string
+    caption: string
+    createdAt: string
+    likesCount: number
+    ownerName: string
+    ownerId: string
+}
 
 export default function EventDetails() {
   const { eventId } = useLocalSearchParams();
@@ -24,28 +28,13 @@ export default function EventDetails() {
   const [event, setEvent] = useState<EventData | null>(null);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<UserData | null>(null);
+  const [photoList, setPhotoList] = useState<any | null>(null);
   const [hasConfirmed, setHasConfirmed] = useState(false);
-
-  const [cameraType, setCameraType] = useState<"back" | "front">("back");
-  const devices = useCameraDevices();
-  const device: CameraDevice | undefined = devices.find((d) => d.position === cameraType);
-  
-  const { hasPermission, requestPermission } = useCameraPermission();
-  const { hasPermission: hasMicPermission, requestPermission: requestMicPermission } = useMicrophonePermission();
-
-  const [permission, setPermission] = useState<boolean | null>(null);
-  const [isRecording, setIsRecording] = useState(false);
-  const [videoUri, setVideoUri] = useState<string | null>(null);
-  const [modalVisible, setModalVisible] = useState(false);
-  const [mode, setMode] = useState<"photo" | "video">("photo"); // Alterna entre modos
-  const cameraRef = useRef<Camera>(null);
-  const [isFlashOn, setIsFlashOn] = useState(false); // Estado para o flash
 
   useEffect(() => {
     api.get('/user')
             .then((response) => {
                 setUser(response.data)
-                fetchEvent(response.data);
                 setLoading(false)
             })
             .catch((error) => {
@@ -79,20 +68,11 @@ export default function EventDetails() {
                 }
             });
 
-    const fetchEvent = async (userLogged: UserData | null) => {
-      console.log(userLogged);
+    const fetchEvent = async () => {
       try {
         const response = await api.get(`/event/${eventId}`);
         setEvent(response.data);
-        event?.participantsList.find((obj) => {
-          console.warn(obj.phone, userLogged?.phone)
-          if(obj.phone === userLogged?.phone) {
-            console.log(obj)
-          }
-        });
-        // setHasConfirmed(confirmed ? true : false)
-        // console.log(confirmed ? true : false)
-        // console.log(confirmed)
+        
     } catch (error) {
         Alert.alert('Erro', 'Não foi possível carregar os detalhes do evento');
         console.error(JSON.stringify(error));
@@ -101,7 +81,23 @@ export default function EventDetails() {
       }
     };
 
-    
+    fetchEvent();
+
+    const fetchPhotos = async () => {
+        try {
+          console.log(eventId)
+          const response = await api.get(`/events/${eventId}/media`);
+          setPhotoList(response.data.content);
+          console.log(response.data.content)
+      } catch (error) {
+          Alert.alert('Erro', 'Não foi possível carregar os detalhes do evento');
+          console.error(JSON.stringify(error));
+        } finally {
+          setLoading(false);
+        }
+      };
+  
+      fetchPhotos();
   }, [eventId]);
 
   if (loading) {
@@ -127,10 +123,10 @@ export default function EventDetails() {
   }
 
   // Formatações
-  const formattedDate = new Date(event.eventDate).toLocaleDateString('pt-BR');
+  const formattedDate = new Date(event.eventDate + 'T00:00:00').toLocaleDateString('pt-BR');
   const formattedTime = event.eventTime.substring(0, 5);
   const participantsInfo = event.maxParticipants && event.maxParticipants > 0 
-    ? `${event.minParticipants}-${event.maxParticipants} participantes`
+    ? `${event.minParticipants} participantes`
     : 'Sem limite de participantes';
 
     const confirmPresence = async () => {
@@ -172,94 +168,6 @@ export default function EventDetails() {
     };
 
 
-    useEffect(() => {
-      (async () => {
-          const cameraStatus = await requestPermission();
-          const micStatus = await requestMicPermission();
-
-          if (cameraStatus && micStatus) {
-              setPermission(true);
-          }
-      })();
-  }, []);
-
-  const takePhoto = async () => {
-      if (!cameraRef.current || !device) return;
-
-      try {
-          const photo = await cameraRef.current.takePhoto();
-          console.log("Foto capturada:", photo);
-
-          const { status } = await MediaLibrary.requestPermissionsAsync();
-          if (status !== "granted") {
-              console.log("Permissão para Media Library não concedida!");
-              setPermission(false);
-              return;
-          }
-
-          await MediaLibrary.createAssetAsync(photo.path);
-          console.log("Foto salva com sucesso:", photo.path);
-      } catch (error) {
-          console.log("Erro ao capturar ou salvar foto:", error);
-      }
-  };
-
-  const startRecording = () => {
-      if (!cameraRef.current || !device) return;
-
-      setIsRecording(true);
-      cameraRef.current.startRecording({
-          onRecordingFinished: (video) => {
-              console.log("Vídeo gravado a:", video);
-              setVideoUri(video.path);
-              setIsRecording(false);
-              setModalVisible(true);
-          },
-          onRecordingError: (error) => {
-              console.log("Erro ao gravar vídeo:", error);
-          },
-      });
-  };
-
-  const stopRecording = async () => {
-      if (cameraRef.current) {
-          await cameraRef.current.stopRecording();
-          setIsRecording(false);
-      }
-  };
-
-  const handleSaveVideo = async () => {
-      if (videoUri) {
-          try {
-              await MediaLibrary.createAssetAsync(videoUri);
-              console.log("Vídeo salvo com sucesso");
-              setVideoUri(null);
-          } catch (error) {
-              console.log("Erro ao salvar vídeo:", error);
-          }
-      }
-  };
-
-  const handleModeSwitch = (selectedMode: "photo" | "video") => {
-      setMode(selectedMode);
-  };
-
-  if (permission === null) return <View />;
-  if (!device) return <View />;
-
-  if (device == null) {
-      return <Text>Carregando câmera...</Text>;
-  }
-
-  const toggleCameraType = () => {
-      console.log(cameraType)
-      setCameraType((prevType) => (prevType === "back" ? "front" : "back"));
-  };
-
-  const toggleFlash = () => {
-      setIsFlashOn((prev) => !prev);
-  };
-  
   return (
     <View style={styles.container}>
       <Header admin={false} />
@@ -292,112 +200,50 @@ export default function EventDetails() {
           <Text style={styles.description}>{event.description}</Text>
         </View>
         {/* {event.participantList.length} */}
-        {event.participant && (
-          event.participantsList && event.participantsList.length > 0 ? (
-              <FlatList
-              data={event.participantsList}
-              renderItem={({ item }) => <ParticipantItem participant={item} />}
-              keyExtractor={(item) => item.email}
-              scrollEnabled={false} // Pois já está dentro de um ScrollView
-              contentContainerStyle={styles.participantsList}
-              />
-          ) : (
-              <Text style={styles.noParticipants}>Nenhum participante confirmado ainda</Text>
-          )
-        )}
-
-        {(hasConfirmed) && (
-            <Pressable 
-              onPress={() => confirmPresence()} 
-              style={globalStyles.button}
-            >
-                {(!event.creator_id) && <Text style={globalStyles.textButton}>  Confirmar Presença </Text>}
-            </Pressable>
-        )}
-
-<View style={styles.container}>
-            <StatusBar hidden />
-            
-            <Camera
-                style={StyleSheet.absoluteFill}
-                ref={cameraRef}
-                device={device}
-                isActive={true}
-                video={mode === "video"}
-                photo={mode === "photo"}
-                audio={mode === "video"}
-                resizeMode="cover"
-                torch={isFlashOn ? 'on' : 'off'}
-            />
-
-            <View style={styles.modeSwitchContainer}>
-                
-                <TouchableOpacity
-                    style={[styles.modeButton, mode === "photo" && styles.activeMode]}
-                    onPress={() => handleModeSwitch("photo")}
-                >
-                    <Text style={styles.modeText}>Foto</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                    style={[styles.modeButton, mode === "video" && styles.activeMode]}
-                    onPress={() => handleModeSwitch("video")}
-                >
-                    <Text style={styles.modeText}>Vídeo</Text>
-                </TouchableOpacity>
-            </View>
-
-            <TouchableOpacity style={styles.toggleCameraType} onPress={toggleCameraType}>
-                <Text style={styles.buttonText}>
-                    {
-                        cameraType === 'back' ? <RotateCameraLeft color="white" height={32} width={32} /> : <RotateCameraRight color="white" height={32} width={32} />
-                    }
+        {event.participantsList && event.participantsList.length > 0 ? (
+            <View>
+                <FlatList
+                data={event.participantsList}
+                renderItem={({ item }) => <ParticipantItem participant={item} />}
+                keyExtractor={(item) => item.email}
+                scrollEnabled={false} // Pois já está dentro de um ScrollView
+                contentContainerStyle={styles.participantsList}
+                />
+                <FlatList 
+                data={photoList}
+                keyExtractor={(item:PhotoComponent) => item.id}
+                renderItem={({ item }) => (
+                    <Timeline 
+                    id={item.id}
+                    fileUrl={item.fileUrl}
+                    mediaType={item.mediaType}
+                    caption={item.caption}
+                    createdAt={item.createdAt}
+                    likesCount={item.likesCount}
+                    ownerName={item.ownerName}
+                    ownerId={item.ownerId}
                     
-                </Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.toggleFlash} onPress={toggleFlash}>
-                <Text style={styles.buttonText}>
-                    {isFlashOn ? <FlashOff color="white" height={32} width={32} /> : <Flash color="white" height={32} width={32} />}
-                </Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.buttonOutCamera}  onPress={() => router.back()}>
-                <ArrowEmailForward color="white" height={32} width={32} />
-            </TouchableOpacity>
-            <TouchableOpacity
-                onPress={mode === "photo" ? takePhoto : isRecording ? stopRecording : startRecording}
-                style={styles.captureButton}
-            >
-            </TouchableOpacity>
-            
-            {videoUri && (
-                <Modal
-                    animationType="slide"
-                    transparent={false}
-                    visible={modalVisible}
-                    onRequestClose={() => setModalVisible(false)}
-                >
-                    <View style={styles.videoContainer}>
-                        <Video
-                            source={{ uri: videoUri }}
-                            rate={1.0}
-                            volume={1.0}
-                            isMuted={false}
-                            shouldPlay
-                            isLooping
-                            resizeMode={ResizeMode.COVER}
-                            style={{ width: widthScreen, height: heightScreen }}
-                        />
-                    </View>
-                    <View style={styles.buttonContainer}>
-                        <TouchableOpacity style={styles.modalButton} onPress={() => setModalVisible(false)}>
-                            <Text style={{ color: "#000" }}>Fechar</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity style={styles.modalButton} onPress={handleSaveVideo}>
-                            <Text style={{ color: "#000" }}>Salvar</Text>
-                        </TouchableOpacity>
-                    </View>
-                </Modal>
+                />
             )}
-        </View>
+        />
+            </View>
+            
+        ) : (
+            <Text style={styles.noParticipants}>Nenhum participante confirmado ainda</Text>
+        )}
+        
+        {
+          (!event.creator_id) && (
+          <Pressable 
+            onPress={() => confirmPresence()} 
+            style={globalStyles.button}
+          >
+              {(!event.creator_id) && <Text style={globalStyles.textButton}>  Confirmar Presença </Text>}
+          </Pressable>
+          )
+        }
+
+       
       </ScrollView>
       
       <Navbar />
@@ -405,3 +251,55 @@ export default function EventDetails() {
   );
 }
 
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
+  content: {
+    padding: 20,
+    paddingBottom: 80,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 20,
+    color: '#333',
+  },
+  detailRow: {
+    flexDirection: 'row',
+    marginBottom: 15,
+    alignItems: 'center',
+  },
+  detailLabel: {
+    fontWeight: 'bold',
+    width: 100,
+    color: '#555',
+  },
+  detailValue: {
+    flex: 1,
+    color: '#333',
+  },
+  descriptionContainer: {
+    marginTop: 20,
+    marginBottom: 30,
+  },
+  descriptionLabel: {
+    fontWeight: 'bold',
+    marginBottom: 5,
+    color: '#555',
+  },
+  description: {
+    color: '#333',
+    lineHeight: 22,
+  },
+  participantsList: {
+    gap: 12,
+  },
+  noParticipants: {
+    color: '#666',
+    fontStyle: 'italic',
+    textAlign: 'center',
+    marginVertical: 10,
+  },
+});

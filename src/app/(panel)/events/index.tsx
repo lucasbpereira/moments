@@ -19,7 +19,7 @@ export default function Events() {
     const [error, setError] = useState(null);
 
     useEffect(() => {
-        api.get('/event')
+        api.get('/event/my_events')
             .then((response) => {
                 console.log('Resposta da API:', response.data); // Exibe a resposta no console
                 setData(response.data)
